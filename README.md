@@ -1,139 +1,185 @@
-# Rails ActiveRecord Playground
+# Rails STI Example - E-commerce Products
 
-This repository contains practical, production-style examples of **ActiveRecord concepts in Rails**.
-
-It is designed as a learning and experimentation space to understand how different Rails features work in real-world scenarios.
+This project demonstrates **Single Table Inheritance (STI)** in Rails using a real-world scenario of an e-commerce system.
 
 ---
 
-## 🚀 Tech Stack
+## 🧠 What is STI?
 
-* **Ruby**: 3.2.2
-* **Rails**: 7.1.6
-* **Database**: PostgreSQL
-* **Environment**: WSL (Ubuntu on Windows)
+STI (Single Table Inheritance) means:
 
----
-
-## 📦 Key Dependencies
-
-### Backend & Core
-
-* `rails` – Web framework
-* `pg` – PostgreSQL database adapter
-* `puma` – Web server
-
-### Frontend (Default Rails Stack)
-
-* `importmap-rails` – JS module management (no bundler)
-* `turbo-rails` – Fast navigation (Hotwire)
-* `stimulus-rails` – Lightweight JS framework
-
-### Assets
-
-* `sprockets-rails` – Asset pipeline
-
-### JSON APIs
-
-* `jbuilder` – JSON response builder
-
-### Development & Debugging
-
-* `debug` – Debugging tool
-* `web-console` – Interactive console in browser
-
-### Testing
-
-* `capybara` – Integration testing
-* `selenium-webdriver` – Browser automation
+* Multiple models share **one database table**
+* A special column called `type` tells Rails which model it is
 
 ---
 
-## 📂 Project Structure
+## 🏗️ Models
 
-This repo is organized by **concepts**:
+We have one base model:
+
+* `Product`
+
+And three child models:
+
+* `Book`
+* `Electronic`
+* `Clothing`
+
+All data is stored in a single table: `products`
+
+---
+
+## ⚙️ STI Column
+
+Rails automatically uses a column named:
 
 ```
-/sti
-/associations
-/callbacks
-/validations
+type
 ```
 
-Each folder contains:
+This column stores values like:
 
-* Explanation
-* Code examples
-* Commands to run
-
----
-
-## 🧠 Topics Covered
-
-* Single Table Inheritance (STI)
-* ActiveRecord Associations
-* Callbacks
-* Validations
-
-(More concepts will be added over time)
+* "Book"
+* "Electronic"
+* "Clothing"
 
 ---
 
-## ⚙️ Setup Instructions
+## 🛠️ Setup Steps
 
-```bash
-# Clone repo
-git clone https://github.com/mhassanobaid/rails-active-record-playground.git
+### 1. Open Rails Console
 
-# Move into project
-cd rails-active-record-playground
-
-# Install dependencies
-bundle install
-
-# Setup database
-rails db:create
-rails db:migrate
-
-# Run server
-rails s
+```
+rails c
 ```
 
 ---
 
-## 🎯 Purpose
-
-This project is built to:
-
-* Practice core Rails concepts
-* Simulate real-world use cases
-* Maintain clean, structured examples
-* Serve as a reference for interviews
-
----
-
-## 🚀 How to Use
-
-Navigate into any topic folder and follow its README:
+### 2. Create Records (Different Types)
 
 ```
-cd models/sti
+Book.create(name: "Ruby Guide", price: 1000, author: "Hassan")
+
+Electronic.create(name: "Laptop", price: 150000, warranty_months: 12)
+
+Clothing.create(name: "T-Shirt", price: 2000, size: "L")
+```
+
+👉 These all go into the **same table (products)**
+👉 Only `type` column differentiates them
+
+---
+
+## 📊 Check Data
+
+### Get all products
+
+```
+Product.all
 ```
 
 ---
 
-## 🔥 Future Plans
+### Check type of first record
 
-* Add more ActiveRecord concepts
-* Add real-world system design examples
-* Improve structure and documentation
-
----
-
-## 👨‍💻 Author
-
-Muhammad Hassan Obaid
+```
+Product.first.type
+# => "Book"
+```
 
 ---
 
-**Note:** This is a learning-focused repository and will evolve over time.
+### Get last product
+
+```
+Product.last
+```
+
+---
+
+### Fetch only Books
+
+```
+Book.all
+```
+
+---
+
+## 🧪 Model Method Example
+
+Assume we have a method in `Book` model:
+
+```ruby
+def display_info
+  "Book: #{name} by #{author}"
+end
+```
+
+### Call method:
+
+```
+Book.first.display_info
+```
+
+---
+
+## 🧠 Important Understanding
+
+Even though we write:
+
+```
+Book.create(...)
+```
+
+Rails actually stores it like:
+
+| id | name       | price | type | author |
+| -- | ---------- | ----- | ---- | ------ |
+| 1  | Ruby Guide | 1000  | Book | Hassan |
+
+👉 Same table
+👉 Different behavior
+
+---
+
+## ✅ When to Use STI
+
+Use STI when:
+
+* Models share most fields
+* Logic is similar
+* Types are limited (2–3)
+
+---
+
+## ❌ When NOT to Use STI
+
+Avoid STI when:
+
+* Too many NULL columns
+* Each type has very different fields
+* System is growing fast
+
+---
+
+## 🎯 Quick Summary
+
+* One table (`products`)
+* Multiple models (`Book`, `Electronic`, `Clothing`)
+* `type` column decides behavior
+* Easy to use but can become messy at scale
+
+---
+
+## 🚀 Pro Tip
+
+If system grows:
+
+👉 Consider:
+
+* Separate tables
+* OR polymorphic associations
+
+---
+
+**End of Example ✅**
