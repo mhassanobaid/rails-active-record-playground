@@ -1,4 +1,4 @@
-class Electronic < Product
+class Sti::Electronic < Sti::Product
   validates :warranty_months, presence: true
 
   def display_info

@@ -1,113 +1,140 @@
-# Rails STI Example - E-commerce Products
+# Rails STI Example — Namespaced Version (`Sti::*`)
 
-This project demonstrates **Single Table Inheritance (STI)** in Rails using a real-world scenario of an e-commerce system.
+This project demonstrates **Single Table Inheritance (STI)** in Rails using an e-commerce example — but with a **cleaner namespaced structure**:
+
+```
+app/models/sti/
+  product.rb
+  book.rb
+  electronic.rb
+  clothing.rb
+```
 
 ---
 
-## 🧠 What is STI?
+# 🧠 What is STI?
 
 STI (Single Table Inheritance) means:
 
-* Multiple models share **one database table**
-* A special column called `type` tells Rails which model it is
+- Multiple models share **one database table**
+- Rails uses a special column called `type`
+- That column stores the **class name** (e.g., `Sti::Book`)
 
 ---
 
-## 🏗️ Models
+# 🏗️ Model Structure (Namespaced)
 
-We have one base model:
+We now use **a namespace**: `Sti::`
 
-* `Product`
+### Base model
+- `Sti::Product`
 
-And three child models:
+### Child models
+- `Sti::Book`
+- `Sti::Electronic`
+- `Sti::Clothing`
 
-* `Book`
-* `Electronic`
-* `Clothing`
+All of these use a **single table**:
 
-All data is stored in a single table: `products`
+```
+products
+```
 
 ---
 
-## ⚙️ STI Column
+# ⚙️ STI Column (IMPORTANT)
 
-Rails automatically uses a column named:
+Rails automatically uses the column:
 
 ```
 type
 ```
 
-This column stores values like:
+And it now stores values like:
 
-* "Book"
-* "Electronic"
-* "Clothing"
+- `"Sti::Book"`
+- `"Sti::Electronic"`
+- `"Sti::Clothing"`
+
+(Previously it stored `"Book"` but now it stores fully namespaced class names.)
 
 ---
 
-## 🛠️ Setup Steps
+# 🛠️ Setup Steps
 
-### 1. Open Rails Console
+## 1. Start Rails Console
 
-```
+```bash
 rails c
 ```
 
 ---
 
-### 2. Create Records (Different Types)
+## 2. Create Records (Namespaced Models)
 
+```ruby
+Sti::Book.create(
+  name: "Ruby Guide",
+  price: 1000,
+  author: "Hassan"
+)
+
+Sti::Electronic.create(
+  name: "Laptop",
+  price: 150000,
+  warranty_months: 12
+)
+
+Sti::Clothing.create(
+  name: "T-Shirt",
+  price: 2000,
+  size: "L"
+)
 ```
-Book.create(name: "Ruby Guide", price: 1000, author: "Hassan")
 
-Electronic.create(name: "Laptop", price: 150000, warranty_months: 12)
-
-Clothing.create(name: "T-Shirt", price: 2000, size: "L")
-```
-
-👉 These all go into the **same table (products)**
-👉 Only `type` column differentiates them
+👉 All these go into one table: **products**  
+👉 `type` column differentiates between models
 
 ---
 
-## 📊 Check Data
+# 📊 Querying Data
 
 ### Get all products
 
-```
-Product.all
+```ruby
+Sti::Product.all
 ```
 
 ---
 
 ### Check type of first record
 
-```
-Product.first.type
-# => "Book"
+```ruby
+Sti::Product.first.type
+# => "Sti::Book"
 ```
 
 ---
 
 ### Get last product
 
-```
-Product.last
-```
-
----
-
-### Fetch only Books
-
-```
-Book.all
+```ruby
+Sti::Product.last
 ```
 
 ---
 
-## 🧪 Model Method Example
+### Fetch only books
 
-Assume we have a method in `Book` model:
+```ruby
+Sti::Book.all
+```
+
+---
+
+# 🧪 Example Method
+
+If your `Sti::Book` model has:
 
 ```ruby
 def display_info
@@ -115,71 +142,73 @@ def display_info
 end
 ```
 
-### Call method:
+Call it:
 
-```
-Book.first.display_info
+```ruby
+Sti::Book.first.display_info
 ```
 
 ---
 
-## 🧠 Important Understanding
+# 🧠 How STI Stores Data
 
-Even though we write:
+Even when you create using:
 
+```ruby
+Sti::Book.create(...)
 ```
-Book.create(...)
-```
 
-Rails actually stores it like:
+Rails saves it like this:
 
-| id | name       | price | type | author |
-| -- | ---------- | ----- | ---- | ------ |
-| 1  | Ruby Guide | 1000  | Book | Hassan |
+| id | name       | price | type        | author |
+| -- | ---------- | ----- | ----------- | ------ |
+| 1  | Ruby Guide | 1000  | Sti::Book   | Hassan |
 
-👉 Same table
-👉 Different behavior
+👉 Same table  
+👉 Different class behavior
 
 ---
 
-## ✅ When to Use STI
+# ✅ When to Use STI
 
 Use STI when:
 
-* Models share most fields
-* Logic is similar
-* Types are limited (2–3)
+- Models share many fields  
+- Behaviors/logic are similar  
+- You have limited types  
+- Namespacing keeps things clean
 
 ---
 
-## ❌ When NOT to Use STI
+# ❌ When NOT to Use STI
 
 Avoid STI when:
 
-* Too many NULL columns
-* Each type has very different fields
-* System is growing fast
+- You have too many type-specific columns  
+- Many NULL fields appear  
+- Models differ significantly  
+- System is large and rapidly changing  
 
 ---
 
-## 🎯 Quick Summary
+# 🎯 Summary
 
-* One table (`products`)
-* Multiple models (`Book`, `Electronic`, `Clothing`)
-* `type` column decides behavior
-* Easy to use but can become messy at scale
-
----
-
-## 🚀 Pro Tip
-
-If system grows:
-
-👉 Consider:
-
-* Separate tables
-* OR polymorphic associations
+- All models in **`app/models/sti/`**
+- Base: `Sti::Product`
+- Children: `Sti::Book`, `Sti::Electronic`, `Sti::Clothing`
+- One table: `products`
+- Rails uses `type` column with namespaced values
+- Clean, scalable structure  
 
 ---
 
-**End of Example ✅**
+# 🚀 Pro Tip
+
+If the system grows large:
+
+👉 Prefer **polymorphic associations** or  
+👉 **Separate tables + inheritance via modules**
+
+---
+
+**End of Namespaced STI Example ✅**

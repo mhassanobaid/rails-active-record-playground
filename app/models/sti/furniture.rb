@@ -1,4 +1,4 @@
-class Furniture < Product
+class Sti::Furniture < Sti::Product
   validates :material, presence: true
 
   def display_info

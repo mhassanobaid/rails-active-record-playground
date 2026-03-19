@@ -1,4 +1,4 @@
-class Book < Product
+class Sti::Book < Sti::Product
   validates :author, presence: true
 
   def display_info

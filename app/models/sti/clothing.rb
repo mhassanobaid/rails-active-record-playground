@@ -1,4 +1,4 @@
-class Clothing < Product
+class Sti::Clothing < Sti::Product
   validates :size, presence: true
 
   def display_info
